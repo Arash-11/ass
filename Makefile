@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -O0
-WFLAGS = -Wall -Werror -Wextra -Wunreachable-code -Wpedantic
+WFLAGS = -Wall -Werror=vla -Wextra -Wunreachable-code -Wpedantic
 COMPILE = $(CC) $(CFLAGS) $(WFLAGS)
 
 TARGET = server
