@@ -7,6 +7,8 @@
 
 #define PORT 8888
 
+#define DEBUG(msg) printf("%s", msg)
+
 int main(void) {
     // set up socket and get file descriptor (sockfd)
     int sockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -25,7 +27,9 @@ int main(void) {
     struct sockaddr_in sa = {
         .sin_family = AF_INET,
         .sin_port = htons(PORT),
-        .sin_addr.s_addr = htonl(INADDR_ANY),
+        //  INADDR_LOOPBACK is the loopback address (localhost).
+        //  INADDR_ANY would be 0.0.0.0, exposing it to the outside
+        .sin_addr.s_addr = htonl(INADDR_LOOPBACK),
     };
     int bind_res = bind(sockfd, (struct sockaddr *)&sa, sizeof(sa));
     if (bind_res == -1) {
@@ -40,6 +44,8 @@ int main(void) {
         exit(1);
     }
 
+    DEBUG("listening on http://localhost:8888\n\n");
+
     while (1) {
         int connfd = accept(sockfd, NULL, 0);
         if (connfd == -1) {
@@ -47,7 +53,7 @@ int main(void) {
             continue;
         }
 
-        char read_buf[10];
+        char read_buf[1024];
         ssize_t bytes_read = read(connfd, read_buf, sizeof(read_buf) - 1);
         if (bytes_read == -1) {
             perror("read error");
@@ -55,7 +61,7 @@ int main(void) {
         }
         read_buf[bytes_read] = '\0';
 
-        printf("read_buf = %s\n", read_buf);
+        DEBUG(read_buf);
 
         close(connfd);
     }
