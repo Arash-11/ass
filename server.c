@@ -9,7 +9,8 @@
 
 #define DEBUG(msg) printf("%s", msg)
 
-int main(void) {
+// returns the listening socket descriptor
+int start_tcp_listener(void) {
     // set up socket and get file descriptor (sockfd)
     int sockfd = socket(PF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
@@ -44,6 +45,11 @@ int main(void) {
         exit(1);
     }
 
+    return sockfd;
+}
+
+int main(void) {
+    int sockfd = start_tcp_listener();
     DEBUG("listening on http://localhost:8888\n\n");
 
     while (1) {
@@ -62,6 +68,10 @@ int main(void) {
         read_buf[bytes_read] = '\0';
 
         DEBUG(read_buf);
+
+        char res[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\nhi there :)";
+
+        write(connfd, res, sizeof(res));
 
         close(connfd);
     }
